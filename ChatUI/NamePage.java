@@ -1,0 +1,58 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class NamePage extends JFrame {
+    JTextField nameField;
+    JButton readyButton;
+
+    public NamePage() {
+        setTitle("Enter Name - Chat App");
+        setSize(400, 250);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JLabel heading = new JLabel("Enter Your Name", SwingConstants.CENTER);
+        heading.setFont(new Font("Arial", Font.BOLD, 22));
+        heading.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+
+        nameField = new JTextField();
+        nameField.setFont(new Font("Arial", Font.PLAIN, 16));
+        nameField.setHorizontalAlignment(SwingConstants.CENTER);
+
+        readyButton = new JButton("Ready to Chat");
+        readyButton.setFont(new Font("Arial", Font.BOLD, 16));
+        readyButton.setBackground(new Color(30, 144, 255));
+        readyButton.setForeground(Color.WHITE);
+        readyButton.setFocusPainted(false);
+        readyButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        readyButton.addActionListener(e -> {
+            String name = nameField.getText().trim();
+            if (!name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
+                dispose();
+
+                // 👉 Open UserA (Chat UI)
+                new UserA();  // If you're testing both users in same window, you can open both
+                // new UserB(); // Optional if you want both
+            } else {
+                JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        centerPanel.add(nameField);
+        centerPanel.add(readyButton);
+
+        add(heading, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(NamePage::new);
+    }
+}
