@@ -1,12 +1,13 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+//import UserDataB;
 
-public class NamePage extends JFrame {
+public class NamePageB extends JFrame {
     JTextField nameField;
     JButton readyButton;
 
-    public NamePage() {
-        setTitle("Enter Name - Chat App");
+    public NamePageB() {
+        setTitle("Enter Name - User B");
         setSize(400, 250);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -27,13 +28,14 @@ public class NamePage extends JFrame {
         readyButton.setFocusPainted(false);
         readyButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        //Store name to UserDataB and open UserB chat
         readyButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
-                UserData.displayName = name;
+                UserDataB.displayName = name;
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                new UserA();
+                new UserB(); //Open UserB after name set
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }
@@ -51,6 +53,6 @@ public class NamePage extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(NamePage::new);
+        SwingUtilities.invokeLater(NamePageB::new);
     }
 }

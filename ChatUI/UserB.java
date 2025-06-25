@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+
 public class UserB implements ActionListener {
     JTextField text;
     JPanel chatArea;
@@ -25,15 +26,32 @@ public class UserB implements ActionListener {
         f.add(header);
 
         try {
+            URL backURL = new URL("https://cdn-icons-png.flaticon.com/512/93/93634.png");
+            ImageIcon backIcon = new ImageIcon(backURL);
+            Image backImage = backIcon.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
+            JLabel back = new JLabel(new ImageIcon(backImage));
+            back.setBounds(5, 20, 25, 25);
+            header.add(back);
+
+            back.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent ae) {
+                    System.exit(0);
+                }
+            });
+
             URL profileURL = new URL("https://cdn-icons-png.flaticon.com/512/847/847969.png");
             Image profileImg = new ImageIcon(profileURL).getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
             JLabel profile = new JLabel(new ImageIcon(profileImg));
-            profile.setBounds(10, 10, 50, 50);
+            profile.setBounds(40, 10, 50, 50);
             header.add(profile);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        JLabel name = new JLabel("User B");
-        name.setBounds(70, 15, 100, 18);
+        String username = (UserDataB.displayName != null && !UserDataB.displayName.isEmpty()) ? UserDataB.displayName : "User B";
+
+        JLabel name = new JLabel(username);
+        name.setBounds(110, 15, 200, 18);
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
         header.add(name);
@@ -42,7 +60,7 @@ public class UserB implements ActionListener {
         chatArea.setLayout(new BoxLayout(chatArea, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(chatArea);
         scrollPane.setBounds(5, 75, 440, 570);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         f.add(scrollPane);
 
         text = new JTextField();
@@ -54,11 +72,20 @@ public class UserB implements ActionListener {
         send.setBounds(320, 655, 123, 40);
         send.setBackground(new Color(7, 94, 84));
         send.setForeground(Color.WHITE);
+        send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
         send.addActionListener(this);
         f.add(send);
 
+        text.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    send.doClick();
+                }
+            }
+        });
+
         f.setSize(450, 700);
-        f.setLocation(800, 20);
+        f.setLocation(700, 20);
         f.setUndecorated(true);
         f.getContentPane().setBackground(Color.WHITE);
         f.setVisible(true);
@@ -68,9 +95,9 @@ public class UserB implements ActionListener {
         try {
             String out = text.getText().trim();
             if (out.equals("")) return;
+            text.setText("");
             addMessage(out, true);
             dout.writeUTF(out);
-            text.setText("");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,7 +119,7 @@ public class UserB implements ActionListener {
 
         JLabel label = new JLabel("<html><p style='width: 150px;'>" + msg + "</p></html>");
         label.setFont(new Font("Tahoma", Font.PLAIN, 16));
-        label.setBackground(new Color(220, 248, 198));
+        label.setBackground(new Color(37, 211, 102));
         label.setOpaque(true);
         label.setBorder(new EmptyBorder(15, 15, 15, 15));
         panel.add(label);

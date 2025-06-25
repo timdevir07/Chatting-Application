@@ -1,6 +1,3 @@
-// ✅ FINAL WORKING CODE FOR UserA.java (Server)
-// Save this file as UserA.java inside ChatUI folder
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -9,6 +6,9 @@ import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+
+// ✅ UserData ka import
+//import UserData;
 
 public class UserA implements ActionListener {
     JTextField text;
@@ -28,15 +28,32 @@ public class UserA implements ActionListener {
         f.add(header);
 
         try {
+            URL backURL = new URL("https://cdn-icons-png.flaticon.com/512/93/93634.png");
+            ImageIcon backIcon = new ImageIcon(backURL);
+            Image backImage = backIcon.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
+            JLabel back = new JLabel(new ImageIcon(backImage));
+            back.setBounds(5, 20, 25, 25);
+            header.add(back);
+
+            back.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent ae) {
+                    System.exit(0);
+                }
+            });
+
             URL profileURL = new URL("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
             Image profileImg = new ImageIcon(profileURL).getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
             JLabel profile = new JLabel(new ImageIcon(profileImg));
-            profile.setBounds(10, 10, 50, 50);
+            profile.setBounds(40, 10, 50, 50);
             header.add(profile);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        JLabel name = new JLabel("User A");
-        name.setBounds(70, 15, 100, 18);
+        String username = (UserData.displayName != null && !UserData.displayName.isEmpty()) ? UserData.displayName : "User A";
+
+        JLabel name = new JLabel(username);
+        name.setBounds(110, 15, 200, 18);
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
         header.add(name);
@@ -45,7 +62,7 @@ public class UserA implements ActionListener {
         chatArea.setLayout(new BoxLayout(chatArea, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(chatArea);
         scrollPane.setBounds(5, 75, 440, 570);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         f.add(scrollPane);
 
         text = new JTextField();
@@ -57,8 +74,18 @@ public class UserA implements ActionListener {
         send.setBounds(320, 655, 123, 40);
         send.setBackground(new Color(7, 94, 84));
         send.setForeground(Color.WHITE);
+        send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
         send.addActionListener(this);
         f.add(send);
+
+        // 🔹 Enter key se message bhejna
+        text.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    send.doClick();
+                }
+            }
+        });
 
         f.setSize(450, 700);
         f.setLocation(200, 20);
@@ -71,9 +98,9 @@ public class UserA implements ActionListener {
         try {
             String out = text.getText().trim();
             if (out.equals("")) return;
+            text.setText(""); // 🔄 Text field pehle clear karo
             addMessage(out, true);
             dout.writeUTF(out);
-            text.setText("");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,3 +150,4 @@ public class UserA implements ActionListener {
         }
     }
 }
+
