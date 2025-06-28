@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 import java.util.regex.*;
 import javax.swing.*;
 
@@ -75,7 +76,7 @@ public class RegisterPageB extends JFrame {
     private void handleOtpLogic() {
         String input = inputField.getText().trim();
         if (isValidEmail(input) || isValidPhone(input)) {
-            generatedOtp = "654321"; // Dummy OTP
+            generatedOtp = generateRandomOtp();
             otpLabel.setText("Your OTP is: " + generatedOtp + " (Valid for 180 sec)");
             askOtpInput();
             errorLabel.setText("");
@@ -87,11 +88,17 @@ public class RegisterPageB extends JFrame {
     private void askOtpInput() {
         String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
         if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
-            dispose();
-            new NamePageB();  // Go to name input for UserB
+            dispose(); // Close register window
+            new NamePageB(); // Go to NamePageB
         } else {
             JOptionPane.showMessageDialog(this, "Invalid OTP!", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private String generateRandomOtp() {
+        Random rand = new Random();
+        int otp = 100000 + rand.nextInt(900000);
+        return String.valueOf(otp);
     }
 
     private boolean isValidEmail(String email) {
@@ -109,8 +116,8 @@ public class RegisterPageB extends JFrame {
         btn.setBackground(new Color(30, 144, 255));
         btn.setForeground(Color.WHITE);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(0, 90, 180), 1),
-            BorderFactory.createEmptyBorder(8, 16, 8, 16)
+                BorderFactory.createLineBorder(new Color(0, 90, 180), 1),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)
         ));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);

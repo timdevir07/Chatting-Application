@@ -7,13 +7,11 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-
 public class UserB implements ActionListener {
     JTextField text;
     JPanel chatArea;
     static JFrame f = new JFrame();
     static DataOutputStream dout;
-    Box vertical = Box.createVerticalBox();
     JScrollPane scrollPane;
 
     UserB() {
@@ -48,7 +46,9 @@ public class UserB implements ActionListener {
             e.printStackTrace();
         }
 
-        String username = (UserDataB.displayName != null && !UserDataB.displayName.isEmpty()) ? UserDataB.displayName : "User B";
+        // ✅ Display UserB ka name from UserDataB
+        String username = (UserDataB.displayName != null && !UserDataB.displayName.isEmpty())
+                ? UserDataB.displayName : "User B";
 
         JLabel name = new JLabel(username);
         name.setBounds(110, 15, 200, 18);
@@ -58,6 +58,7 @@ public class UserB implements ActionListener {
 
         chatArea = new JPanel();
         chatArea.setLayout(new BoxLayout(chatArea, BoxLayout.Y_AXIS));
+
         scrollPane = new JScrollPane(chatArea);
         scrollPane.setBounds(5, 75, 440, 570);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -76,6 +77,7 @@ public class UserB implements ActionListener {
         send.addActionListener(this);
         f.add(send);
 
+        // 🔹 Enter key press to send
         text.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -95,7 +97,7 @@ public class UserB implements ActionListener {
         try {
             String out = text.getText().trim();
             if (out.equals("")) return;
-            text.setText("");
+            text.setText(""); // Clear input
             addMessage(out, true);
             dout.writeUTF(out);
         } catch (Exception e) {
@@ -110,7 +112,11 @@ public class UserB implements ActionListener {
         chatArea.add(wrapper);
         chatArea.add(Box.createVerticalStrut(15));
         f.revalidate();
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
+
+        // 🔽 Auto-scroll to latest message
+        SwingUtilities.invokeLater(() -> 
+            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum())
+        );
     }
 
     public JPanel formatLabel(String msg) {

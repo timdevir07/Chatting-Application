@@ -1,3 +1,11 @@
+//*****************Full updated****************//
+// Updated RegisterPage.java
+// Features:
+// - Valid Email/Phone Check
+// - OTP Generation and Validation
+// - After OTP, goes to NamePage (not UserA directly)
+// - Button styling and messages intact
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
@@ -34,7 +42,6 @@ public class RegisterPage extends JFrame {
                     inputField.setForeground(Color.BLACK);
                 }
             }
-
             public void focusLost(FocusEvent e) {
                 if (inputField.getText().isEmpty()) {
                     inputField.setText("Enter email or phone number");
@@ -64,8 +71,7 @@ public class RegisterPage extends JFrame {
         getOtpButton.addActionListener(e -> handleOtpLogic());
 
         loginButton.addActionListener(e -> {
-            dispose(); // current window band ho
-            new LoginPage(); // new login window khule
+            JOptionPane.showMessageDialog(this, "Login not implemented yet.");
         });
 
         add(title, BorderLayout.NORTH);
@@ -88,8 +94,8 @@ public class RegisterPage extends JFrame {
     private void askOtpInput() {
         String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
         if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
-            dispose(); // register window close
-            new NamePage(); // open name page
+            dispose();
+            new NamePage();
         } else {
             JOptionPane.showMessageDialog(this, "Invalid OTP!", "Error", JOptionPane.ERROR_MESSAGE);
         }

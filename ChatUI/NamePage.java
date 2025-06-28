@@ -1,5 +1,5 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class NamePage extends JFrame {
     JTextField nameField;
@@ -33,7 +33,7 @@ public class NamePage extends JFrame {
                 UserData.displayName = name;
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                new UserA();
+                new UserA(); // Launches chat window with user name
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }

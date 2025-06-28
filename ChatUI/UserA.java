@@ -2,15 +2,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.text.*;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.*;
 
-// ✅ UserData ka import
-//import UserData;
-
 public class UserA implements ActionListener {
+
     JTextField text;
     JPanel chatArea;
     static JFrame f = new JFrame();
@@ -28,6 +26,7 @@ public class UserA implements ActionListener {
         f.add(header);
 
         try {
+            // Back icon
             URL backURL = new URL("https://cdn-icons-png.flaticon.com/512/93/93634.png");
             ImageIcon backIcon = new ImageIcon(backURL);
             Image backImage = backIcon.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
@@ -41,35 +40,41 @@ public class UserA implements ActionListener {
                 }
             });
 
+            // Profile icon
             URL profileURL = new URL("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
             Image profileImg = new ImageIcon(profileURL).getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
             JLabel profile = new JLabel(new ImageIcon(profileImg));
             profile.setBounds(40, 10, 50, 50);
             header.add(profile);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // ✅ Display user name from NamePage
         String username = (UserData.displayName != null && !UserData.displayName.isEmpty()) ? UserData.displayName : "User A";
-
         JLabel name = new JLabel(username);
         name.setBounds(110, 15, 200, 18);
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
         header.add(name);
 
+        // Chat area
         chatArea = new JPanel();
         chatArea.setLayout(new BoxLayout(chatArea, BoxLayout.Y_AXIS));
+
         scrollPane = new JScrollPane(chatArea);
         scrollPane.setBounds(5, 75, 440, 570);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         f.add(scrollPane);
 
+        // Text field
         text = new JTextField();
         text.setBounds(5, 655, 310, 40);
         text.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
         f.add(text);
 
+        // Send button
         JButton send = new JButton("Send");
         send.setBounds(320, 655, 123, 40);
         send.setBackground(new Color(7, 94, 84));
@@ -78,7 +83,7 @@ public class UserA implements ActionListener {
         send.addActionListener(this);
         f.add(send);
 
-        // 🔹 Enter key se message bhejna
+        // 🔹 Send message with Enter key
         text.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -94,18 +99,20 @@ public class UserA implements ActionListener {
         f.setVisible(true);
     }
 
+    // 🔹 Send message action
     public void actionPerformed(ActionEvent ae) {
         try {
             String out = text.getText().trim();
             if (out.equals("")) return;
-            text.setText(""); // 🔄 Text field pehle clear karo
-            addMessage(out, true);
-            dout.writeUTF(out);
+            text.setText(""); // 🔄 clear input field
+            addMessage(out, true); // show in own window (right)
+            dout.writeUTF(out);    // send to UserB
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // 🔹 Add formatted message with alignment
     public void addMessage(String msg, boolean alignRight) {
         JPanel messagePanel = formatLabel(msg);
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -113,9 +120,12 @@ public class UserA implements ActionListener {
         chatArea.add(wrapper);
         chatArea.add(Box.createVerticalStrut(15));
         f.revalidate();
+
+        // Auto-scroll to bottom
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
     }
 
+    // 🔹 Message bubble format
     public JPanel formatLabel(String msg) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -143,11 +153,10 @@ public class UserA implements ActionListener {
 
             while (true) {
                 String msg = din.readUTF();
-                userA.addMessage(msg, false);
+                userA.addMessage(msg, false); // Show incoming message on left
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
-

@@ -1,6 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-//import UserDataB;
 
 public class NamePageB extends JFrame {
     JTextField nameField;
@@ -28,14 +27,13 @@ public class NamePageB extends JFrame {
         readyButton.setFocusPainted(false);
         readyButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        //Store name to UserDataB and open UserB chat
         readyButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
                 UserDataB.displayName = name;
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                new UserB(); //Open UserB after name set
+                new UserB();  // ✅ Correctly opens chat UI for UserB
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }
