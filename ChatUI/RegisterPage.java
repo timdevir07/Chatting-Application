@@ -17,6 +17,7 @@ public class RegisterPage extends JFrame {
     JButton getOtpButton, loginButton;
     JLabel otpLabel, errorLabel;
     String generatedOtp = "";
+    String currentInput = "";
 
     public RegisterPage() {
         setTitle("Register - Chat App");
@@ -82,6 +83,7 @@ public class RegisterPage extends JFrame {
     private void handleOtpLogic() {
         String input = inputField.getText().trim();
         if (isValidEmail(input) || isValidPhone(input)) {
+            currentInput = input;
             generatedOtp = generateRandomOtp();
             otpLabel.setText("Your OTP is: " + generatedOtp + " (Valid for 180 sec)");
             askOtpInput();
@@ -94,8 +96,9 @@ public class RegisterPage extends JFrame {
     private void askOtpInput() {
         String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
         if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
+            boolean isNew = ChatAppDB.registerOrCheckUser(currentInput);
             dispose();
-            new NamePage();
+            new NamePage(currentInput, isNew);
         } else {
             JOptionPane.showMessageDialog(this, "Invalid OTP!", "Error", JOptionPane.ERROR_MESSAGE);
         }

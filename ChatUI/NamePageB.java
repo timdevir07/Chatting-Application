@@ -33,7 +33,7 @@ public class NamePageB extends JFrame {
                 UserDataB.displayName = name;
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                new UserB();  // ✅ Correctly opens chat UI for UserB
+                new UserB();  //Correctly opens chat UI for UserB
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }

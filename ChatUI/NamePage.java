@@ -4,9 +4,14 @@ import javax.swing.*;
 public class NamePage extends JFrame {
     JTextField nameField;
     JButton readyButton;
+    String contactInput;
+    boolean isNewUser;
 
-    public NamePage() {
-        setTitle("Enter Name - Chat App");
+    public NamePage(String contactInput, boolean isNewUser) {
+        this.contactInput = contactInput;
+        this.isNewUser = isNewUser;
+
+        setTitle("Enter Name");
         setSize(400, 250);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -30,10 +35,13 @@ public class NamePage extends JFrame {
         readyButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
-                UserData.displayName = name;
+                if (isNewUser) {
+                    ChatAppDB.updateUserName(contactInput, name);
+                }
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                new UserA(); // Launches chat window with user name
+                // Proceed to chat UI
+                new UserA();  // ya UserB, as per your app flow
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }
@@ -49,8 +57,5 @@ public class NamePage extends JFrame {
 
         setVisible(true);
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(NamePage::new);
-    }
 }
+
