@@ -6,9 +6,11 @@ import javax.swing.*;
 
 public class RegisterPageB extends JFrame {
     JTextField inputField;
-    JButton getOtpButton, loginButton;
+    JButton getOtpButton;
     JLabel otpLabel, errorLabel;
     String generatedOtp = "";
+    String currentInput;
+    boolean isNew;
 
     public RegisterPageB() {
         setTitle("Register - User B");
@@ -17,16 +19,12 @@ public class RegisterPageB extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("Register (User B)", SwingConstants.CENTER);
+        JLabel title = new JLabel("Register - User B", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
 
-        inputField = new JTextField();
-        inputField.setFont(new Font("Arial", Font.PLAIN, 16));
-        inputField.setPreferredSize(new Dimension(250, 35));
-        inputField.setText("Enter email or phone number");
+        inputField = new JTextField("Enter email or phone number");
         inputField.setForeground(Color.GRAY);
-
+        inputField.setFont(new Font("Arial", Font.PLAIN, 16));
         inputField.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 if (inputField.getText().equals("Enter email or phone number")) {
@@ -34,7 +32,6 @@ public class RegisterPageB extends JFrame {
                     inputField.setForeground(Color.BLACK);
                 }
             }
-
             public void focusLost(FocusEvent e) {
                 if (inputField.getText().isEmpty()) {
                     inputField.setText("Enter email or phone number");
@@ -43,7 +40,7 @@ public class RegisterPageB extends JFrame {
             }
         });
 
-        getOtpButton = createStyledButton("Get OTP");
+        getOtpButton = createButton("Get OTP");
         otpLabel = new JLabel("", SwingConstants.CENTER);
         otpLabel.setFont(new Font("Arial", Font.BOLD, 16));
         otpLabel.setForeground(new Color(0, 102, 0));
@@ -51,54 +48,44 @@ public class RegisterPageB extends JFrame {
         errorLabel = new JLabel("", SwingConstants.CENTER);
         errorLabel.setForeground(Color.RED);
 
-        loginButton = createStyledButton("Go to Login");
-
-        JPanel centerPanel = new JPanel(new GridLayout(6, 1, 10, 10));
+        JPanel centerPanel = new JPanel(new GridLayout(5, 1, 10, 10));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         centerPanel.add(inputField);
         centerPanel.add(getOtpButton);
         centerPanel.add(otpLabel);
         centerPanel.add(errorLabel);
-        centerPanel.add(loginButton);
 
         getOtpButton.addActionListener(e -> handleOtpLogic());
 
-        loginButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Login page for UserB under development!");
-        });
-
         add(title, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
-
         setVisible(true);
     }
 
     private void handleOtpLogic() {
-        String input = inputField.getText().trim();
-        if (isValidEmail(input) || isValidPhone(input)) {
-            generatedOtp = generateRandomOtp();
-            otpLabel.setText("Your OTP is: " + generatedOtp + " (Valid for 180 sec)");
-            askOtpInput();
+        currentInput = inputField.getText().trim();
+        if (isValidEmail(currentInput) || isValidPhone(currentInput)) {
+            isNew = !ChatAppDB.isUserRegistered(currentInput);
+            if (isNew) {
+                ChatAppDB.registerUser(currentInput);
+            }
+            generatedOtp = String.valueOf(100000 + new Random().nextInt(900000));
+            otpLabel.setText("Your OTP: " + generatedOtp);
             errorLabel.setText("");
+            askOtpInput();
         } else {
-            errorLabel.setText("Please enter a valid email or 10-digit phone number.");
+            errorLabel.setText("Please enter valid email or phone.");
         }
     }
 
     private void askOtpInput() {
         String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
         if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
-            dispose(); // Close register window
-            new NamePageB(); // Go to NamePageB
+            dispose();
+            new NamePageB(currentInput, isNew);
         } else {
             JOptionPane.showMessageDialog(this, "Invalid OTP!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private String generateRandomOtp() {
-        Random rand = new Random();
-        int otp = 100000 + rand.nextInt(900000);
-        return String.valueOf(otp);
     }
 
     private boolean isValidEmail(String email) {
@@ -109,18 +96,13 @@ public class RegisterPageB extends JFrame {
         return phone.matches("\\d{10}");
     }
 
-    private JButton createStyledButton(String text) {
+    private JButton createButton(String text) {
         JButton btn = new JButton(text);
-        btn.setFocusPainted(false);
         btn.setFont(new Font("Arial", Font.BOLD, 14));
         btn.setBackground(new Color(30, 144, 255));
         btn.setForeground(Color.WHITE);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(0, 90, 180), 1),
-                BorderFactory.createEmptyBorder(8, 16, 8, 16)
-        ));
+        btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setOpaque(true);
         return btn;
     }
 

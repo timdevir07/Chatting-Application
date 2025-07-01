@@ -5,9 +5,11 @@ public class NamePage extends JFrame {
     JTextField nameField;
     JButton readyButton;
     String contactInput;
+    boolean isNewUser;
 
     public NamePage(String contactInput, boolean isNewUser) {
         this.contactInput = contactInput;
+        this.isNewUser = isNewUser;
 
         setTitle("Enter Name");
         setSize(400, 250);
@@ -15,30 +17,29 @@ public class NamePage extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel heading = new JLabel("Enter Your Name", SwingConstants.CENTER);
-        heading.setFont(new Font("Arial", Font.BOLD, 22));
-        heading.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        JLabel title = new JLabel("Enter Your Name", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 22));
 
         nameField = new JTextField();
         nameField.setFont(new Font("Arial", Font.PLAIN, 16));
         nameField.setHorizontalAlignment(SwingConstants.CENTER);
 
         readyButton = new JButton("Ready to Chat");
-        readyButton.setFont(new Font("Arial", Font.BOLD, 16));
-        readyButton.setBackground(new Color(30, 144, 255));
+        readyButton.setBackground(new Color(46, 204, 113));
         readyButton.setForeground(Color.WHITE);
-        readyButton.setFocusPainted(false);
-        readyButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        readyButton.setFont(new Font("Arial", Font.BOLD, 16));
 
         readyButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
-                ChatAppDB.updateUserName(contactInput, name); // Always update
-                JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
+                if (isNewUser) {
+                    ChatAppDB.updateUserName(contactInput, name);
+                }
+                UserData.displayName = name;
                 dispose();
-                new UserA(); // or new UserB();
+                new UserA();
             } else {
-                JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please enter your name!");
             }
         });
 
@@ -47,9 +48,8 @@ public class NamePage extends JFrame {
         centerPanel.add(nameField);
         centerPanel.add(readyButton);
 
-        add(heading, BorderLayout.NORTH);
+        add(title, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
-
         setVisible(true);
     }
 }

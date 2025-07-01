@@ -23,25 +23,24 @@ public class ChatAppDB {
             return false;
         }
     }
-    
+
     public static void registerUser(String input) {
-    try (Connection conn = getConnection()) {
-        PreparedStatement ps;
-        if (input.contains("@")) {
-            ps = conn.prepareStatement("INSERT INTO users (email, name) VALUES (?, '')");
-            ps.setString(1, input);
-        } else {
-            ps = conn.prepareStatement("INSERT INTO users (phone, name) VALUES (?, '')");
-            ps.setString(1, input);
-        }
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        if (!e.getMessage().contains("Duplicate entry")) {
-            e.printStackTrace();
+        try (Connection conn = getConnection()) {
+            PreparedStatement ps;
+            if (input.contains("@")) {
+                ps = conn.prepareStatement("INSERT INTO users (email) VALUES (?)");
+                ps.setString(1, input);
+            } else {
+                ps = conn.prepareStatement("INSERT INTO users (phone) VALUES (?)");
+                ps.setString(1, input);
+            }
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            if (!e.getMessage().contains("Duplicate entry")) {
+                e.printStackTrace();
+            }
         }
     }
-}
-
 
     public static void updateUserName(String input, String name) {
         try (Connection conn = getConnection()) {
@@ -56,6 +55,20 @@ public class ChatAppDB {
                 ps.setString(2, input);
             }
             ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveMessage(String sender, String receiver, String message) {
+        String query = "INSERT INTO messages (sender, receiver, message) VALUES (?, ?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, sender);
+            ps.setString(2, receiver);
+            ps.setString(3, message);
+            ps.executeUpdate();
+            System.out.println(" Message saved to DB");
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,162 +1,48 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import javax.swing.*;
-import javax.swing.border.*;
 
-public class UserA implements ActionListener {
+public class UserA extends JFrame {
+    JTextArea chatArea;
+    JTextField inputField;
+    JButton sendButton;
 
-    JTextField text;
-    JPanel chatArea;
-    static JFrame f = new JFrame();
-    static DataOutputStream dout;
-    Box vertical = Box.createVerticalBox();
-    JScrollPane scrollPane;
+    public UserA() {
+        setTitle("UserA Chat");
+        setSize(400, 500);
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-    UserA() {
-        f.setLayout(null);
+        chatArea = new JTextArea();
+        chatArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(chatArea);
 
-        JPanel header = new JPanel();
-        header.setBackground(new Color(7, 94, 84));
-        header.setBounds(0, 0, 450, 70);
-        header.setLayout(null);
-        f.add(header);
+        inputField = new JTextField();
+        sendButton = new JButton("Send");
 
-        try {
-            // Back icon
-            URL backURL = new URL("https://cdn-icons-png.flaticon.com/512/93/93634.png");
-            ImageIcon backIcon = new ImageIcon(backURL);
-            Image backImage = backIcon.getImage().getScaledInstance(25, 25, Image.SCALE_DEFAULT);
-            JLabel back = new JLabel(new ImageIcon(backImage));
-            back.setBounds(5, 20, 25, 25);
-            header.add(back);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(inputField, BorderLayout.CENTER);
+        bottomPanel.add(sendButton, BorderLayout.EAST);
 
-            back.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent ae) {
-                    System.exit(0);
-                }
-            });
+        sendButton.addActionListener(e -> sendMessage());
 
-            // Profile icon
-            URL profileURL = new URL("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
-            Image profileImg = new ImageIcon(profileURL).getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT);
-            JLabel profile = new JLabel(new ImageIcon(profileImg));
-            profile.setBounds(40, 10, 50, 50);
-            header.add(profile);
+        inputField.addActionListener(e -> sendMessage());
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
+        setVisible(true);
+    }
+
+    private void sendMessage() {
+        String msg = inputField.getText().trim();
+        if (!msg.isEmpty()) {
+            chatArea.append("Me: " + msg + "\n");
+            ChatAppDB.saveMessage(UserData.displayName, "UserB", msg);
+            inputField.setText("");
         }
-
-        // ✅ Display user name from NamePage
-        String username = (UserData.displayName != null && !UserData.displayName.isEmpty()) ? UserData.displayName : "User A";
-        JLabel name = new JLabel(username);
-        name.setBounds(110, 15, 200, 18);
-        name.setForeground(Color.WHITE);
-        name.setFont(new Font("SAN_SERIF", Font.BOLD, 18));
-        header.add(name);
-
-        // Chat area
-        chatArea = new JPanel();
-        chatArea.setLayout(new BoxLayout(chatArea, BoxLayout.Y_AXIS));
-
-        scrollPane = new JScrollPane(chatArea);
-        scrollPane.setBounds(5, 75, 440, 570);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        f.add(scrollPane);
-
-        // Text field
-        text = new JTextField();
-        text.setBounds(5, 655, 310, 40);
-        text.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
-        f.add(text);
-
-        // Send button
-        JButton send = new JButton("Send");
-        send.setBounds(320, 655, 123, 40);
-        send.setBackground(new Color(7, 94, 84));
-        send.setForeground(Color.WHITE);
-        send.setFont(new Font("SAN_SERIF", Font.PLAIN, 16));
-        send.addActionListener(this);
-        f.add(send);
-
-        // 🔹 Send message with Enter key
-        text.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    send.doClick();
-                }
-            }
-        });
-
-        f.setSize(450, 700);
-        f.setLocation(200, 20);
-        f.setUndecorated(true);
-        f.getContentPane().setBackground(Color.WHITE);
-        f.setVisible(true);
-    }
-
-    // 🔹 Send message action
-    public void actionPerformed(ActionEvent ae) {
-        try {
-            String out = text.getText().trim();
-            if (out.equals("")) return;
-            text.setText(""); // 🔄 clear input field
-            addMessage(out, true); // show in own window (right)
-            dout.writeUTF(out);    // send to UserB
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 🔹 Add formatted message with alignment
-    public void addMessage(String msg, boolean alignRight) {
-        JPanel messagePanel = formatLabel(msg);
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.add(messagePanel, alignRight ? BorderLayout.LINE_END : BorderLayout.LINE_START);
-        chatArea.add(wrapper);
-        chatArea.add(Box.createVerticalStrut(15));
-        f.revalidate();
-
-        // Auto-scroll to bottom
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum()));
-    }
-
-    // 🔹 Message bubble format
-    public JPanel formatLabel(String msg) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JLabel label = new JLabel("<html><p style='width: 150px;'>" + msg + "</p></html>");
-        label.setFont(new Font("Tahoma", Font.PLAIN, 16));
-        label.setBackground(new Color(37, 211, 102));
-        label.setOpaque(true);
-        label.setBorder(new EmptyBorder(15, 15, 15, 15));
-        panel.add(label);
-
-        JLabel time = new JLabel(new SimpleDateFormat("hh:mm a").format(new Date()));
-        panel.add(time);
-
-        return panel;
     }
 
     public static void main(String[] args) {
-        UserA userA = new UserA();
-        try {
-            ServerSocket server = new ServerSocket(6001);
-            Socket socket = server.accept();
-            DataInputStream din = new DataInputStream(socket.getInputStream());
-            dout = new DataOutputStream(socket.getOutputStream());
-
-            while (true) {
-                String msg = din.readUTF();
-                userA.addMessage(msg, false); // Show incoming message on left
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        SwingUtilities.invokeLater(UserA::new);
     }
 }
