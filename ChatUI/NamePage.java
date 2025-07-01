@@ -5,11 +5,9 @@ public class NamePage extends JFrame {
     JTextField nameField;
     JButton readyButton;
     String contactInput;
-    boolean isNewUser;
 
     public NamePage(String contactInput, boolean isNewUser) {
         this.contactInput = contactInput;
-        this.isNewUser = isNewUser;
 
         setTitle("Enter Name");
         setSize(400, 250);
@@ -35,13 +33,10 @@ public class NamePage extends JFrame {
         readyButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
-                if (isNewUser) {
-                    ChatAppDB.updateUserName(contactInput, name);
-                }
+                ChatAppDB.updateUserName(contactInput, name); // Always update
                 JOptionPane.showMessageDialog(this, "Welcome " + name + "!");
                 dispose();
-                // Proceed to chat UI
-                new UserA();  // ya UserB, as per your app flow
+                new UserA(); // or new UserB();
             } else {
                 JOptionPane.showMessageDialog(this, "Please enter your name!", "Warning", JOptionPane.WARNING_MESSAGE);
             }
@@ -58,4 +53,3 @@ public class NamePage extends JFrame {
         setVisible(true);
     }
 }
-

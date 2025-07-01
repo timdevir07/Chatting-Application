@@ -1,11 +1,3 @@
-//*****************Full updated****************//
-// Updated RegisterPage.java
-// Features:
-// - Valid Email/Phone Check
-// - OTP Generation and Validation
-// - After OTP, goes to NamePage (not UserA directly)
-// - Button styling and messages intact
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
@@ -17,7 +9,8 @@ public class RegisterPage extends JFrame {
     JButton getOtpButton, loginButton;
     JLabel otpLabel, errorLabel;
     String generatedOtp = "";
-    String currentInput = "";
+    String currentInput;
+    boolean isNew;
 
     public RegisterPage() {
         setTitle("Register - Chat App");
@@ -43,6 +36,7 @@ public class RegisterPage extends JFrame {
                     inputField.setForeground(Color.BLACK);
                 }
             }
+
             public void focusLost(FocusEvent e) {
                 if (inputField.getText().isEmpty()) {
                     inputField.setText("Enter email or phone number");
@@ -70,10 +64,7 @@ public class RegisterPage extends JFrame {
         centerPanel.add(loginButton);
 
         getOtpButton.addActionListener(e -> handleOtpLogic());
-
-        loginButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Login not implemented yet.");
-        });
+        loginButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "Login not implemented yet."));
 
         add(title, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
@@ -81,13 +72,16 @@ public class RegisterPage extends JFrame {
     }
 
     private void handleOtpLogic() {
-        String input = inputField.getText().trim();
-        if (isValidEmail(input) || isValidPhone(input)) {
-            currentInput = input;
+        currentInput = inputField.getText().trim();
+        if (isValidEmail(currentInput) || isValidPhone(currentInput)) {
+            isNew = !ChatAppDB.isUserRegistered(currentInput);
+            if (isNew) {
+                ChatAppDB.registerUser(currentInput);
+            }
             generatedOtp = generateRandomOtp();
             otpLabel.setText("Your OTP is: " + generatedOtp + " (Valid for 180 sec)");
-            askOtpInput();
             errorLabel.setText("");
+            askOtpInput();
         } else {
             errorLabel.setText("Please enter a valid email or 10-digit phone number.");
         }
@@ -96,7 +90,6 @@ public class RegisterPage extends JFrame {
     private void askOtpInput() {
         String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
         if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
-            boolean isNew = ChatAppDB.registerOrCheckUser(currentInput);
             dispose();
             new NamePage(currentInput, isNew);
         } else {
