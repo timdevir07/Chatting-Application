@@ -1,121 +1,83 @@
+package ChatUI;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.regex.*;
+import java.util.Random;
 import javax.swing.*;
 
 public class LoginPage extends JFrame {
-    JTextField inputField;
-    JButton getOtpButton;
-    JLabel otpLabel, errorLabel;
-    String generatedOtp = "";
-    String currentInput;
+    JTextField phoneField, emailField;
+    JButton getOtpBtn, loginBtn;
+    JLabel phoneOtpLabel, emailOtpLabel;
+    String phoneOtp = "";
+    String emailOtp = "";
 
     public LoginPage() {
-        setTitle("Login - Chat App");
-        setSize(400, 350);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+        setTitle("UserA Login");
+        setSize(300, 400);
+        setLocation(300, 200);
+        setLayout(new GridLayout(8, 1, 5, 5));
 
-        JLabel title = new JLabel("Login", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        phoneField = new JTextField();
+        emailField = new JTextField();
+        getOtpBtn = new JButton("Get OTP");
+        loginBtn = new JButton("Login");
 
-        inputField = new JTextField();
-        inputField.setFont(new Font("Arial", Font.PLAIN, 16));
-        inputField.setText("Enter email or phone number");
-        inputField.setForeground(Color.GRAY);
+        phoneOtpLabel = new JLabel();
+        emailOtpLabel = new JLabel();
 
-        inputField.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                if (inputField.getText().equals("Enter email or phone number")) {
-                    inputField.setText("");
-                    inputField.setForeground(Color.BLACK);
-                }
-            }
+        add(new JLabel("Phone Number:"));
+        add(phoneField);
+        add(new JLabel("Email ID:"));
+        add(emailField);
+        add(getOtpBtn);
+        add(phoneOtpLabel);
+        add(emailOtpLabel);
+        add(loginBtn);
 
-            public void focusLost(FocusEvent e) {
-                if (inputField.getText().isEmpty()) {
-                    inputField.setText("Enter email or phone number");
-                    inputField.setForeground(Color.GRAY);
+        getOtpBtn.setBackground(new Color(7, 94, 84));
+        getOtpBtn.setForeground(Color.WHITE);
+        loginBtn.setBackground(new Color(7, 94, 84));
+        loginBtn.setForeground(Color.WHITE);
+
+        getOtpBtn.addActionListener(e -> generateAndShowOtp());
+
+        loginBtn.addActionListener(e -> verifyAndLogin());
+
+        emailField.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent ke) {
+                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    verifyAndLogin();
                 }
             }
         });
 
-        getOtpButton = createStyledButton("Enter OTP to Login");
-        otpLabel = new JLabel("", SwingConstants.CENTER);
-        otpLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        otpLabel.setForeground(new Color(0, 102, 0));
-
-        errorLabel = new JLabel("", SwingConstants.CENTER);
-        errorLabel.setForeground(Color.RED);
-
-        JPanel centerPanel = new JPanel(new GridLayout(5, 1, 10, 10));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-        centerPanel.add(inputField);
-        centerPanel.add(getOtpButton);
-        centerPanel.add(otpLabel);
-        centerPanel.add(errorLabel);
-
-        getOtpButton.addActionListener(e -> handleLoginOtp());
-
-        add(title, BorderLayout.NORTH);
-        add(centerPanel, BorderLayout.CENTER);
-
         setVisible(true);
     }
 
-    private void handleLoginOtp() {
-        currentInput = inputField.getText().trim();
-        if (isValidEmail(currentInput) || isValidPhone(currentInput)) {
-            boolean exists = ChatAppDB.isUserRegistered(currentInput);
-            if (!exists) {
-                errorLabel.setText("User not registered. Please register first.");
-                return;
-            }
-            generatedOtp = String.valueOf(100000 + new java.util.Random().nextInt(900000));
-            otpLabel.setText("Your OTP is: " + generatedOtp + " (Mock)");
-            askOtpInput();
-            errorLabel.setText("");
-        } else {
-            errorLabel.setText("Please enter a valid email or 10-digit phone number.");
-        }
+    void generateAndShowOtp() {
+        phoneOtp = generateOtp();
+        emailOtp = generateOtp();
+
+        phoneOtpLabel.setText("Phone OTP: " + phoneOtp);
+        emailOtpLabel.setText("Email OTP: " + emailOtp);
     }
 
-    private void askOtpInput() {
-        String enteredOtp = JOptionPane.showInputDialog(this, "Enter OTP:");
-        if (enteredOtp != null && enteredOtp.equals(generatedOtp)) {
+    String generateOtp() {
+        Random rand = new Random();
+        int otp = 1000 + rand.nextInt(9000);
+        return String.valueOf(otp);
+    }
+
+    void verifyAndLogin() {
+        if (!phoneOtp.isEmpty() && !emailOtp.isEmpty()) {
+            new NamePage();
             dispose();
-            new NamePage(currentInput, false);  // Pass input + false (existing user)
         } else {
-            JOptionPane.showMessageDialog(this, "Invalid OTP!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please generate OTP first.");
         }
-    }
-
-    private boolean isValidEmail(String email) {
-        return Pattern.matches("^[\\w.-]+@[\\w.-]+\\.\\w{2,}$", email);
-    }
-
-    private boolean isValidPhone(String phone) {
-        return phone.matches("\\d{10}");
-    }
-
-    private JButton createStyledButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setFocusPainted(false);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
-        btn.setBackground(new Color(46, 204, 113));
-        btn.setForeground(Color.WHITE);
-        btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(39, 174, 96), 1),
-            BorderFactory.createEmptyBorder(8, 16, 8, 16)
-        ));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setOpaque(true);
-        return btn;
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(LoginPage::new);
+        new LoginPage();
     }
 }

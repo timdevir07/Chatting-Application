@@ -1,5 +1,5 @@
+package ChatUI;
+
 public class UserData {
-    public static String displayName = "";
+    public static String displayName = "UserA";
 }
-
-
